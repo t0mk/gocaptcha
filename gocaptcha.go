@@ -31,7 +31,8 @@ var (
 )
 
 func generateCode(length int) string {
-	characters := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	// no capital O and zero
+	characters := "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"
 	sb := strings.Builder{}
 	for i := 0; i < length; i++ {
 		sb.WriteByte(characters[rand.Intn(len(characters))])
@@ -150,20 +151,19 @@ func CaptchaHandler(w http.ResponseWriter, r *http.Request) {
 	} else if path == "/verify" {
 		code := r.URL.Query().Get("code")
 		response := map[string]bool{"valid": false}
-
+		w.Header().Set("Content-Type", "application/json")
 		if code != "" {
 			if _, exists := captchaMap.Load(code); exists {
 				captchaMap.Delete(code)
-				response["valid"] = true
+				response["valid"] = true 
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(response)
+				return
 			}
 		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(response)
 	} else {
 		http.NotFound(w, r)
 	}
 }
-
-
