@@ -25,7 +25,7 @@ var fontFile embed.FS
 var (
 	captchaMap      sync.Map
 	captchaTTL      = time.Hour
-	captchaWidth    = 180
+	captchaWidth    = 230
 	captchaHeight   = 60
 	captchaFontSize = 36.
 )
@@ -155,7 +155,7 @@ func CaptchaHandler(w http.ResponseWriter, r *http.Request) {
 		if code != "" {
 			if _, exists := captchaMap.Load(code); exists {
 				captchaMap.Delete(code)
-				response["valid"] = true 
+				response["valid"] = true
 				w.WriteHeader(http.StatusOK)
 				json.NewEncoder(w).Encode(response)
 				return
