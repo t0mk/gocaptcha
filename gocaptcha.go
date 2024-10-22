@@ -32,7 +32,7 @@ var (
 
 func generateCode(length int) string {
 	// no capital O and zero
-	characters := "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"
+	characters := "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789"
 	sb := strings.Builder{}
 	for i := 0; i < length; i++ {
 		sb.WriteByte(characters[rand.Intn(len(characters))])
