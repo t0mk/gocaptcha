@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"embed"
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/png"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -28,6 +30,7 @@ var (
 	captchaWidth    = 230
 	captchaHeight   = 60
 	captchaFontSize = 36.
+	allowedOrigins  = map[string]struct{}{}
 )
 
 func generateCode(length int) string {
@@ -128,10 +131,37 @@ func addNoise(img *image.RGBA, numNoise int) {
 		img.Set(x, y, color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 255})
 	}
 }
+
+func init() {
+	// Initialize the allowed origins map
+	originsRaw := os.Getenv("ALLOWED_ORIGINS")
+	if originsRaw != "" {
+		fmt.Println("Allowed origins:", originsRaw)
+		allowedOrigins = map[string]struct{}{}
+		allowedOriginsSlice := strings.Split(originsRaw, ",")
+		for _, origin := range allowedOriginsSlice {
+			allowedOrigins[origin] = struct{}{}
+		}
+	}
+}
+
 func CaptchaHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
 	if path == "/getcaptcha" {
+		origin := r.Header.Get("Origin")
+		responseAllowOrigin := "https://mozilla.org"
+		if _, exists := allowedOrigins[origin]; exists {
+			responseAllowOrigin = origin
+		}
+		w.Header().Set("Access-Control-Allow-Origin", responseAllowOrigin)
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		code := generateCode(6)
 
 		imgBytes, err := createCaptchaImage(code)

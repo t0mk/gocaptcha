@@ -6,12 +6,18 @@ The captcha image is generated using the [comic.ttf](https://github.com/googlefo
 
 Verfication is done by checking if the captcha image is stored in memory. If it is, the captcha is considered valid.
 
+Set envvar ALLOWED_ORIGINS if you want to call `/getcaptcha` from browser. If you won't set it, header `Access-Control-Allow-Origin` will be set to `https://mozilla.org`.
+
 ## Deploy to Google Cloud Functions
+
+echo '{ "ALLOWED_ORIGINS": "https://example.com,https://anotherdomain.com" }' > env.json
+
 
 ```bash
 gcloud functions deploy CaptchaFunction \
 --runtime go122 \
 --trigger-http \
+--env-vars-file env.json \
 --allow-unauthenticated \
 --region europe-north1 \
 --entry-point CaptchaHandler
