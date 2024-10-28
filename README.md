@@ -10,10 +10,9 @@ Set envvar ALLOWED_ORIGINS if you want to call `/getcaptcha` from browser. If yo
 
 ## Deploy to Google Cloud Functions
 
+```bash
 echo '{ "ALLOWED_ORIGINS": "https://example.com,https://anotherdomain.com" }' > env.json
 
-
-```bash
 gcloud functions deploy CaptchaFunction \
 --runtime go122 \
 --trigger-http \
