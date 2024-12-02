@@ -178,15 +178,16 @@ func CaptchaHandler(w http.ResponseWriter, r *http.Request) {
 		response := map[string]bool{"valid": false}
 		w.Header().Set("Content-Type", "application/json")
 		if code != "" {
+			w.WriteHeader(http.StatusOK)
+			response["valid"] = false
 			if _, exists := captchaMap.Load(code); exists {
 				captchaMap.Delete(code)
 				response["valid"] = true
-				w.WriteHeader(http.StatusOK)
-				json.NewEncoder(w).Encode(response)
-				return
-			}
+			} 
+			json.NewEncoder(w).Encode(response)
+			return
 		}
-		w.WriteHeader(http.StatusForbidden)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(response)
 	} else {
 		http.NotFound(w, r)
