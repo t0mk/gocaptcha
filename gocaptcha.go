@@ -149,12 +149,7 @@ func CaptchaHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
 	if path == "/getcaptcha" {
-		origin := r.Header.Get("Origin")
-		responseAllowOrigin := "https://mozilla.org"
-		if _, exists := allowedOrigins[origin]; exists {
-			responseAllowOrigin = origin
-		}
-		w.Header().Set("Access-Control-Allow-Origin", responseAllowOrigin)
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		if r.Method == "OPTIONS" {
 			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
